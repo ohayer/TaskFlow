@@ -1,0 +1,40 @@
+# .NET build artifacts
+bin/
+obj/
+publish/
+publish.zip
+*.user
+*.suo
+*.pdb
+*.dll
+*.exe
+*.cache
+*.log
+
+# Visual Studio / Rider
+.vs/
+.vscode/
+.idea/
+*.sln.docstates
+*.suo
+*.userprefs
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# User-secrets and local configs (te NIE powinny byc w repo)
+secrets.json
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+
+# Tymczasowe / Output
+*.tmp
+*.bak
+
+# OS
+.DS_Store
+Thumbs.db

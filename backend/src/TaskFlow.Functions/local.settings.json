@@ -1,0 +1,12 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "ConnectionStrings__Storage": "",
+    "ConnectionStrings__ServiceBus": "",
+    "ConnectionStrings__Cosmos": "",
+    "ConnectionStrings__Sql": "",
+    "ConnectionStrings__Redis": ""
+  }
+}

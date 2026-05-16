@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "TaskFlow",
+    "slug": "taskflow-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "taskflow",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.taskflow.mobile"
+    },
+    "android": {
+      "package": "com.taskflow.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#0566c9"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "TaskFlow potrzebuje dostępu do zdjęć aby dodać załącznik do zadania.",
+          "cameraPermission": "TaskFlow potrzebuje dostępu do aparatu aby zrobić zdjęcie jako załącznik."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "apiUrl": "http://localhost:5156"
+    }
+  }
+}
