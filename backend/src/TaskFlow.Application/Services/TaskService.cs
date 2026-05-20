@@ -1,5 +1,7 @@
 using TaskFlow.Application.Abstractions;
 using TaskFlow.Application.Dtos;
+using TaskFlow.Application.Events;
+using TaskFlow.Application.Extensions;
 using TaskFlow.Domain.Entities;
 using TaskFlow.Domain.Enums;
 using TaskFlow.Domain.Repositories;
@@ -62,7 +64,7 @@ public class TaskService : ITaskService
         var task = new TaskItem
         {
             ProjectId = projectId,
-            Title = dto.Title.Trim(),
+            Title = dto.Title.TrimOrEmpty(), // metody rozszerzające
             Description = dto.Description?.Trim(),
             AssigneeId = dto.AssigneeId,
             DueDate = dto.DueDate,
@@ -80,7 +82,11 @@ public class TaskService : ITaskService
         }, ct);
 
         if (task.AssigneeId.HasValue && task.AssigneeId != requesterId)
+        {
             await _notifications.NotifyTaskAssignedAsync(task.Id, task.AssigneeId.Value, requesterId, ct);
+            // Zdarzenia (events)
+            TaskEvents.RaiseTaskAssigned(new TaskAssignedEventArgs { TaskId = task.Id, AssigneeId = task.AssigneeId.Value });
+        }
 
         return ToDto(task);
     }
@@ -111,7 +117,11 @@ public class TaskService : ITaskService
         }, ct);
 
         if (task.AssigneeId.HasValue && task.AssigneeId != previousAssignee && task.AssigneeId != requesterId)
+        {
             await _notifications.NotifyTaskAssignedAsync(task.Id, task.AssigneeId.Value, requesterId, ct);
+            // Zdarzenia (events)
+            TaskEvents.RaiseTaskAssigned(new TaskAssignedEventArgs { TaskId = task.Id, AssigneeId = task.AssigneeId.Value });
+        }
 
         return ToDto(task);
     }

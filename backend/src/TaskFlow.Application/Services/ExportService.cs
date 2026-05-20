@@ -48,21 +48,27 @@ public class ExportService : IExportService
 
     private static byte[] BuildCsv(IReadOnlyList<Domain.Entities.TaskItem> tasks)
     {
+        var rows = new string[tasks.Count];
+        // Wielowątkowość — równoległe formatowanie wierszy CSV
+        Parallel.For(0, tasks.Count, i => rows[i] = FormatCsvRow(tasks[i]));
+
         var sb = new StringBuilder();
         sb.AppendLine("Id;Title;Description;Status;AssigneeId;DueDate;CreatedAt;UpdatedAt");
-        foreach (var t in tasks)
-        {
-            sb.Append(t.Id).Append(';')
-              .Append(Escape(t.Title)).Append(';')
-              .Append(Escape(t.Description ?? "")).Append(';')
-              .Append(t.Status).Append(';')
-              .Append(t.AssigneeId).Append(';')
-              .Append(t.DueDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? "").Append(';')
-              .Append(t.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)).Append(';')
-              .AppendLine(t.UpdatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture));
-        }
+        foreach (var row in rows)
+            sb.AppendLine(row);
         return Encoding.UTF8.GetBytes(sb.ToString());
     }
+
+    private static string FormatCsvRow(Domain.Entities.TaskItem t) =>
+        string.Join(';',
+            t.Id,
+            Escape(t.Title),
+            Escape(t.Description ?? ""),
+            t.Status,
+            t.AssigneeId,
+            t.DueDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? "",
+            t.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture),
+            t.UpdatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture));
 
     private static string Escape(string s) => s.Contains(';') || s.Contains('"') || s.Contains('\n')
         ? $"\"{s.Replace("\"", "\"\"")}\""

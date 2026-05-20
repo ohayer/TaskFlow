@@ -4,7 +4,6 @@ using TaskFlow.Domain.Entities;
 using TaskFlow.Domain.Repositories;
 
 namespace TaskFlow.Application.Services;
-
 public class AuthService : IAuthService
 {
     private readonly IUserRepository _users;
@@ -17,7 +16,6 @@ public class AuthService : IAuthService
         _hasher = hasher;
         _jwt = jwt;
     }
-
     public async Task<AuthResponseDto?> RegisterAsync(RegisterDto dto, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(dto.Email) || !dto.Email.Contains('@'))
@@ -42,7 +40,6 @@ public class AuthService : IAuthService
         return new AuthResponseDto(token, expiresAt,
             new UserDto(user.Id, user.Email, user.DisplayName, user.NotificationPreference));
     }
-
     public async Task<AuthResponseDto?> LoginAsync(LoginDto dto, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password))

@@ -73,6 +73,9 @@ public static class DependencyInjection
         });
         services.AddSingleton<INotificationPublisher, ServiceBusNotificationPublisher>();
 
+        // wzorzec Factory + Refleksja (NotificationStrategyFactory)
+        services.AddScoped<INotificationStrategyFactory, NotificationStrategyFactory>();
+
         // Strategy Pattern: notyfikacje (rejestracja wszystkich strategii — serwis wybiera po kanale)
         services.AddScoped<INotificationStrategy, EmailNotificationStrategy>();
         services.AddScoped<INotificationStrategy, SmsNotificationStrategy>();

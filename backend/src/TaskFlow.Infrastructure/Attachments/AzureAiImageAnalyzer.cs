@@ -52,6 +52,7 @@ public class AzureAiImageAnalyzer : IImageAnalyzer
             // (zwraca HTTP 400 'feature is not supported in this region').
             // Caption dziala m.in. w eastus/westus/westeurope/koreacentral/southeastasia.
             // W swedencentral wywolujemy tylko Tags.
+            
             var result = await _client.AnalyzeAsync(
                 BinaryData.FromStream(ms),
                 VisualFeatures.Tags,

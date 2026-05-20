@@ -9,7 +9,6 @@ namespace TaskFlow.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _auth;
-
     public AuthController(IAuthService auth) => _auth = auth;
 
     [HttpPost("register")]
@@ -37,3 +36,5 @@ public class AuthController : ControllerBase
             : Ok(result);
     }
 }
+
+

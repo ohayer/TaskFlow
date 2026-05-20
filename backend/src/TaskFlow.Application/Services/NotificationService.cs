@@ -8,21 +8,22 @@ public class NotificationService : INotificationService
 {
     private readonly IUserRepository _users;
     private readonly ITaskRepository _tasks;
-    private readonly IEnumerable<INotificationStrategy> _strategies;            // Strategy Pattern: wszystkie zarejestrowane strategie
+    private readonly INotificationStrategyFactory _strategyFactory;            // Strategy Pattern: wszystkie zarejestrowane strategie
     private readonly ILogger<NotificationService> _logger;
 
     public NotificationService(
         IUserRepository users,
         ITaskRepository tasks,
-        IEnumerable<INotificationStrategy> strategies,
+        INotificationStrategyFactory strategyFactory,
         ILogger<NotificationService> logger)
     {
         _users = users;
         _tasks = tasks;
-        _strategies = strategies;
+        _strategyFactory = strategyFactory;
         _logger = logger;
     }
 
+    // Asynchroniczność — metoda async/await bez blokowania wątku
     public async Task<bool> NotifyTaskAssignedAsync(Guid taskId, Guid assigneeId, Guid assignedById, CancellationToken ct = default)
     {
         var assignee = await _users.GetByIdAsync(assigneeId, ct);
@@ -62,17 +63,16 @@ public class NotificationService : INotificationService
     // Strategy Pattern: wybór strategii po preferencji użytkownika
     private async Task<bool> SelectAndSendAsync(Domain.Enums.NotificationChannel preferred, NotificationContext ctx, CancellationToken ct)
     {
-        var strategy = _strategies.FirstOrDefault(s => s.Channel == preferred);
-        if (strategy is null)
+        try
         {
-            _logger.LogWarning("No strategy registered for channel {Channel}, falling back to first available", preferred);
-            strategy = _strategies.FirstOrDefault();
+            // wzorzec Factory — fabryka tworzy strategię dla wybranego kanału
+            var strategy = _strategyFactory.Create(preferred);
+            return await strategy.SendAsync(ctx, ct);
         }
-        if (strategy is null)
+        catch (Exception ex)
         {
-            _logger.LogError("No notification strategies registered at all");
+            _logger.LogError(ex, "Cannot create notification strategy for {Channel}", preferred);
             return false;
         }
-        return await strategy.SendAsync(ctx, ct);
     }
 }
