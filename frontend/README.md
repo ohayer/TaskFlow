@@ -26,7 +26,7 @@ Webowy klient aplikacji TaskFlow zbudowany w **React 19 + Vite 5 + TypeScript + 
 | Stan serwerowy | TanStack Query v5 (z cache + invalidacjami) |
 | HTTP | axios 1.7 (z interceptorem JWT) |
 | Auth | własny JWT (kontroler `/api/auth` w backendzie) |
-| Testy | Vitest 2.1 + RTL + happy-dom (10) · Playwright 1.60 E2E Chromium (14) |
+| Testy | Vitest 2.1 + React Testing Library + happy-dom |
 | Linting | ESLint 10 + typescript-eslint |
 
 ## Wymagania
@@ -95,56 +95,12 @@ Otworzy `http://localhost:4173`. Bundle wskazuje na URL z `.env.production`.
 
 ## Testy
 
-Dwa poziomy: **Vitest** (jednostkowe / komponenty) i **Playwright** (E2E w przeglądarce). E2E nie wymagają backendu — API jest mockowane w `e2e/fixtures.ts`.
-
-### Vitest (10 testów)
-
 ```powershell
-npm test           # watch mode
-npm run test:run   # jednorazowy przebieg (CI)
+npm test         # watch mode
+npm run test:run # single run (CI-friendly)
 ```
 
-Środowisko: **happy-dom** (lekki DOM). Pliki w `src/__tests__/`:
-
-| Plik | Co testuje |
-|---|---|
-| `LoginPage.test.tsx` | nagłówek, submit logowania, przełącznik rejestracji |
-| `DashboardPage.test.tsx` | nagłówek „Twoje projekty”, render listy z API |
-| `models.test.ts` | etykiety statusów zadań (zgodność z enum backendu) |
-
-Konfiguracja: `vite.config.ts` (plugin Vitest), `src/test-setup.ts`.
-
-### Playwright E2E (14 testów, Chromium)
-
-Testy end-to-end weryfikują aplikację **tak jak widzi ją użytkownik** — w prawdziwej przeglądarce (Chromium), z klikaniem, wpisywaniem tekstu i asercjami na widocznych elementach UI.
-
-**Jak to działa**
-
-1. Playwright uruchamia Vite (`npm run dev` → `http://localhost:5173`).
-2. Scenariusze w `e2e/*.spec.ts` otwierają kolejne ekrany (login, dashboard, projekt, zadanie, profil).
-3. Wywołania API są mockowane w `e2e/fixtures.ts` — testy nie łączą się z backendem .NET ani Azure.
-4. Po przebiegu można otworzyć raport HTML ze zrzutami i czasami wykonania.
-
-**Uruchomienie**
-
-```powershell
-npm install                     # pierwszy raz (pobiera też Chromium przez postinstall)
-npm run test:e2e                # 14 testów, ~10 s
-npm run test:e2e:report         # raport HTML — osobna komenda, po udanym test:e2e
-npm run test:e2e:ui             # tryb interaktywny Playwright
-```
-
-**Pokrycie scenariuszy (14)**
-
-| Plik | Testy | Co sprawdzamy |
-|---|---|---|
-| `e2e/login.spec.ts` | 4 | formularz logowania, zakładki login/rejestracja, komunikat błędu z API, przejście na dashboard po sukcesie |
-| `e2e/dashboard.spec.ts` | 3 | pusty stan bez projektów, wyświetlenie listy z API, utworzenie projektu i pojawienie się na liście |
-| `e2e/project.spec.ts` | 4 | szczegóły projektu, pusta lista zadań, wejście w zadanie, dodanie zadania, filtr statusu „In Progress” |
-| `e2e/task.spec.ts` | 2 | zmiana statusu zadania i zapis, załącznik z opisem i tagami AI Vision |
-| `e2e/profile.spec.ts` | 1 | dane konta użytkownika, wybór kanału SMS i zapis preferencji |
-
-**Konfiguracja:** `playwright.config.ts` — katalog `e2e/`, projekt `chromium`, `baseURL` `http://localhost:5173`. `VITE_API_BASE_URL` wskazuje ten sam origin co frontend, żeby mocki `page.route` działały bez problemów z CORS.
+Vitest z happy-dom (lekki DOM zamiast jsdom). Testy w `src/**/__tests__/` lub `src/**/*.test.{ts,tsx}`.
 
 ## Struktura projektu
 
@@ -205,12 +161,9 @@ frontend/
 npm run dev        # Vite dev server (HMR) na :5173
 npm run build      # produkcyjny bundle do dist/
 npm run preview    # podgląd produkcyjnego buildu (po `build`)
-npm test              # Vitest w watch mode
-npm run test:run      # Vitest single run
-npm run test:e2e      # Playwright E2E
-npm run test:e2e:ui   # Playwright UI mode
-npm run test:e2e:report  # raport HTML E2E
-npm run lint          # ESLint
+npm test           # Vitest w watch mode
+npm run test:run   # Vitest single run
+npm run lint       # ESLint
 ```
 
 ## Powiązane

@@ -121,18 +121,12 @@ Następnie w `mobile/.env`: `EXPO_PUBLIC_API_URL=http://<TWÓJ-IP-LAN>:5156`.
 
 ## Testy
 
-Dwa projekty xUnit w `backend/tests/`: **unit** (mocki, szybkie) i **integracyjne** (pełne HTTP przez `WebApplicationFactory`).
-
 ```powershell
-cd backend
-dotnet test                              # 46 unit + 11 integracyjnych
-dotnet test tests/TaskFlow.UnitTests     # tylko unit (~1 s)
-dotnet test tests/TaskFlow.IntegrationTests   # tylko API (~4 s)
+cd C:\Dane\studia\projekt\backend
+dotnet test tests/TaskFlow.UnitTests
 ```
 
-Stack: **xUnit** + **Moq** + **FluentAssertions**. Integracyjne używają fałszywych implementacji w `TaskFlow.IntegrationTests/Infrastructure/` (cache, audit, blob, eksporter, AI).
-
-### Unit — 46 testów / 7 plików
+**46 testów / 7 plików**, czas wykonania ~600 ms:
 
 | Plik | Testy | Co pokrywa |
 |---|---|---|
@@ -143,16 +137,6 @@ Stack: **xUnit** + **Moq** + **FluentAssertions**. Integracyjne używają fałsz
 | `Strategies/NotificationStrategyTests.cs` | 5 | Email/SMS/InApp + factory |
 | `Strategies/AttachmentProcessorTests.cs` | 6 | Image/PDF/Generic + MIME routing |
 | `Repositories/EfRepositoriesTests.cs` | 5 | EF Core repos (InMemory DB) |
-
-### Integracyjne — 11 testów / 3 pliki
-
-| Plik | Testy | Co pokrywa |
-|---|---|---|
-| `AuthEndpointsTests.cs` | 4 | rejestracja, logowanie, walidacja, JWT |
-| `ProjectsEndpointsTests.cs` | 3 | lista, tworzenie, autoryzacja |
-| `TasksEndpointsTests.cs` | 4 | CRUD zadań przez HTTP |
-
-Testy E2E UI (Playwright) są w `../frontend/e2e/` — patrz [`../README.md`](../README.md#testy).
 
 ## Struktura projektu
 
@@ -192,7 +176,7 @@ backend/
 │
 └── tests/
     ├── TaskFlow.UnitTests/             # xUnit + Moq + FluentAssertions — 46 testów
-    └── TaskFlow.IntegrationTests/      # xUnit + WebApplicationFactory — 11 testów HTTP API
+    └── TaskFlow.IntegrationTests/      # szkielet do testów E2E (WebApplicationFactory)
 ```
 
 ## Wzorce projektowe
