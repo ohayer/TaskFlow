@@ -47,7 +47,30 @@ dotnet run --project src/TaskFlow.Api
 
 API wystartuje na `http://localhost:5156`, Swagger UI pod `http://localhost:5156/swagger`.
 
-**Uruchomienie testów:**
+## Testy 
+
+**Testy E2E (Playwright)**
+
+Testy end-to-end weryfikują aplikację webową TaskFlow w przeglądarce **Chromium** (Playwright). Symulują ścieżki użytkownika od logowania po ustawienia profilu. Żądania REST są mockowane w `frontend/e2e/fixtures.ts` — testy **nie wymagają uruchomionego backendu**.
+
+**Uruchomienie testów webowych:**
+```bash
+cd frontend
+npm install
+npm run test:e2e
+npm run test:e2e:report
+
+```
+| Obszar | Plik | Liczba testów | Zakres |
+| :--- | :--- | :---: | :--- |
+| Autoryzacja | `login.spec.ts` | 4 | formularz logowania, zakładki login/rejestracja, błąd API, przejście na dashboard |
+| Projekty | `dashboard.spec.ts` | 3 | pusty stan, lista projektów z API, utworzenie nowego projektu |
+| Zadania w projekcie | `project.spec.ts` | 4 | widok projektu, lista zadań, wejście w zadanie, nowe zadanie, filtr statusu |
+| Szczegóły zadania | `task.spec.ts` | 2 | zmiana statusu i zapis, załącznik z tagami AI Vision |
+| Profil | `profile.spec.ts` | 1 | dane konta, zapis preferencji powiadomień (SMS) |
+| **Razem** | `frontend/e2e/` | **14** | — |
+
+**Uruchomienie testów backendowych:**
 
 ```powershell
 cd backend
@@ -73,12 +96,6 @@ npm run dev      # http://localhost:5173
 ```powershell
 npm run build    # output: dist/
 npm run preview  # podgląd produkcyjnego build
-```
-
-**Testy:**
-
-```powershell
-npm test
 ```
 
 ## Mobile (`mobile/`)
