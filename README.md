@@ -82,6 +82,18 @@ npm test
 ```
 
 ## Mobile (`mobile/`)
+**Wygląd aplikacji mobilnej**
+
+<img width="200" height="370" alt="image" src="https://github.com/user-attachments/assets/a29976b1-a149-4f91-b30f-a3782b276fb1" /> <img width="200" height="370" alt="image" src="https://github.com/user-attachments/assets/0329479b-863a-4397-a37f-2684ffeea1aa" /> <img width="200" height="370" alt="image" src="https://github.com/user-attachments/assets/c09e03bb-7285-4b24-a903-c4bd56962706" /> <img width="200" height="370" alt="image" src="https://github.com/user-attachments/assets/096d2e6f-c6d5-4e6e-b660-1ba2c657b040" /><img width="200" height="370" alt="image" src="https://github.com/user-attachments/assets/dc1cc588-133f-4e3a-b099-6f2b9b961bee" /> <img width="200" height="370" alt="image" src="https://github.com/user-attachments/assets/c3a1c0c1-2fa3-47eb-a65f-b940ee668abf" /> <img width="200" height="370" alt="image" src="https://github.com/user-attachments/assets/c7c5e925-db8e-429e-90d7-b02a4c77c288" /> <img width="200" height="370" alt="image" src="https://github.com/user-attachments/assets/8c84f44a-6051-4477-a88f-288e0d4dd618" />
+
+
+
+
+
+
+
+
+
 
 ```powershell
 cd mobile
