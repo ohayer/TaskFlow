@@ -5,7 +5,6 @@ using TaskFlow.Application.Abstractions;
 using TaskFlow.Domain.Entities;
 
 namespace TaskFlow.Infrastructure.Caching;
-
 public class RedisTaskListCache : ITaskListCache
 {
     private readonly IDistributedCache _cache;
@@ -17,7 +16,6 @@ public class RedisTaskListCache : ITaskListCache
         _cache = cache;
         _logger = logger;
     }
-
     private static string Key(Guid projectId) => $"project:{projectId}:tasks";
 
     public async Task<IReadOnlyList<TaskItem>?> GetTasksAsync(Guid projectId, CancellationToken ct = default)
@@ -34,7 +32,6 @@ public class RedisTaskListCache : ITaskListCache
             return null;
         }
     }
-
     public async Task SetTasksAsync(Guid projectId, IReadOnlyList<TaskItem> tasks, CancellationToken ct = default)
     {
         try
@@ -47,7 +44,6 @@ public class RedisTaskListCache : ITaskListCache
             _logger.LogWarning(ex, "Cache write failed for project {ProjectId}", projectId);
         }
     }
-
     public async Task InvalidateAsync(Guid projectId, CancellationToken ct = default)
     {
         try

@@ -12,14 +12,14 @@ Aplikacja do zarządzania zadaniami zespołowymi z trzema klientami (web, mobile
 | **Chmura** | Azure: App Service, SQL Database, Cosmos DB, Blob/Files Storage, Service Bus, Redis Cache, Functions, Key Vault, App Insights, AI Vision (Computer Vision) |
 | **IaC** | Bicep (~10 modułów) |
 | **Wzorce projektowe** | Repository Pattern (×4 implementacje) + Strategy Pattern (×2 use case'y: notyfikacje + procesory załączników) |
-| **Testy** | 46 unit testów xUnit + Moq + FluentAssertions |
+| **Testy** | Backend: xUnit (46 unit + 11 integracyjnych) · Frontend: Vitest (10) + Playwright E2E (14) · Mobile: brak |
 
 ## Struktura
 
 ```
 .
-├── backend/        # ASP.NET Core 8 — REST API + Functions + testy unit
-├── frontend/       # React 19 + Vite — webowy klient produkcyjny
+├── backend/        # ASP.NET Core 8 — REST API + Functions + testy (unit + integracyjne)
+├── frontend/       # React 19 + Vite — webowy klient + testy (Vitest + Playwright)
 ├── mobile/         # Expo + React Native — klient mobile (web/iOS/Android)
 └── README.md
 ```
@@ -47,14 +47,7 @@ dotnet run --project src/TaskFlow.Api
 
 API wystartuje na `http://localhost:5156`, Swagger UI pod `http://localhost:5156/swagger`.
 
-**Uruchomienie testów:**
-
-```powershell
-cd backend
-dotnet test tests/TaskFlow.UnitTests
-```
-
-> 46 testów ≈ 600 ms.
+**Testy:** patrz sekcja [Testy](#testy) — `dotnet test` w `backend/`.
 
 ## Frontend (`frontend/`)
 
@@ -75,11 +68,7 @@ npm run build    # output: dist/
 npm run preview  # podgląd produkcyjnego build
 ```
 
-**Testy:**
-
-```powershell
-npm test
-```
+**Testy:** patrz sekcja [Testy](#testy) — Vitest i Playwright w `frontend/`.
 
 ## Mobile (`mobile/`)
 
@@ -169,6 +158,63 @@ Function wybiera procesor po MIME type.
 - Audit log: każda akcja (utworzenie, edycja, usunięcie, upload, zmiana roli) zapisywana w Cosmos DB
 - Eksport zadań do CSV (zapis w Azure Files)
 - Preferencje powiadomień (Email / SMS / InApp)
+
+## Testy
+
+Projekt ma trzy warstwy testów automatycznych (backend + frontend web). Aplikacja **mobile** nie ma własnego zestawu testów.
+
+| Warstwa | Narzędzie | Lokalizacja | Liczba |
+|---|---|---|---|
+| Backend — unit | xUnit + Moq + FluentAssertions | `backend/tests/TaskFlow.UnitTests/` | 46 |
+| Backend — integracyjne | xUnit + `WebApplicationFactory` | `backend/tests/TaskFlow.IntegrationTests/` | 11 |
+| Frontend — komponenty / logika | Vitest + React Testing Library + happy-dom | `frontend/src/__tests__/` | 10 |
+| Frontend — E2E (UI) | Playwright (Chromium) | `frontend/e2e/*.spec.ts` | 14 |
+
+### Backend
+
+```powershell
+cd backend
+dotnet test                              # wszystkie (46 unit + 11 integracyjnych)
+dotnet test tests/TaskFlow.UnitTests     # tylko unit (~1 s)
+dotnet test tests/TaskFlow.IntegrationTests   # tylko HTTP API (~4 s)
+```
+
+**Unit** — serwisy (`AuthService`, `TaskService`, `ProjectService`, `ExportService`), repozytoria EF (InMemory), strategie notyfikacji i procesorów załączników.
+
+**Integracyjne** — endpointy `Auth`, `Projects`, `Tasks` przez `TestWebAppFactory` z fałszywymi zależnościami (cache, audit, blob, AI).
+
+Szczegóły: [`backend/README.md`](backend/README.md#testy).
+
+### Frontend
+
+```powershell
+cd frontend
+npm install
+npx playwright install chromium   # pierwszy raz — przeglądarka dla E2E
+
+npm run test:run       # Vitest — jednorazowy przebieg (CI)
+npm test               # Vitest — watch mode
+
+npm run test:e2e       # Playwright — 14 testów E2E (uruchamia Vite na :5173)
+npm run test:e2e:ui    # Playwright — tryb UI
+npm run test:e2e:report   # raport HTML po E2E (playwright-report/)
+```
+
+**Vitest** — `LoginPage`, `DashboardPage`, mapowanie statusów w `models.test.ts`. API mockowane w testach komponentów.
+
+**Playwright E2E (14 testów)** — testy end-to-end uruchamiane w przeglądarce Chromium. Symulują ścieżki użytkownika w aplikacji webowej: od logowania, przez zarządzanie projektami i zadaniami, po ustawienia profilu. Żądania REST (`/api/...`) są przechwytywane w `e2e/fixtures.ts` (`page.route`) i zwracają przewidywalne dane testowe, dzięki czemu testy są szybkie, stabilne i **nie wymagają uruchomionego backendu** ani bazy danych. Przy starcie Playwright sam podnosi serwer deweloperski Vite (`npm run dev` na porcie 5173). Konfiguracja: `frontend/playwright.config.ts`.
+
+| Plik | Testy | Zakres |
+|---|---|---|
+| `e2e/login.spec.ts` | 4 | formularz logowania, przełączanie login/rejestracja, błąd uwierzytelnienia, przejście na dashboard |
+| `e2e/dashboard.spec.ts` | 3 | pusty stan, lista projektów z API, tworzenie nowego projektu |
+| `e2e/project.spec.ts` | 4 | widok projektu, lista zadań, nawigacja do szczegółów zadania, dodanie zadania, filtrowanie po statusie |
+| `e2e/task.spec.ts` | 2 | edycja statusu zadania (zapis), wyświetlanie załącznika z tagami AI Vision |
+| `e2e/profile.spec.ts` | 1 | dane konta, zapis preferencji powiadomień (SMS) |
+
+> Uruchamiaj raport osobno: najpierw `npm run test:e2e`, potem `npm run test:e2e:report`. Nie doklejaj drugiej komendy do pierwszej w jednej linii.
+
+Szczegóły: [`frontend/README.md`](frontend/README.md#testy).
 
 ## Licencja
 
